@@ -9,8 +9,6 @@ import runner/runner
 
 pub fn main() {
   let day = 0
-  //   let input = runner.parse_line(day)
-  //   list.map(input, debug_line)
   let res =
     runner.parse_line(day)
     |> list.map(parse_line)
