@@ -107,22 +107,17 @@ fn second_chance(
         [] -> True
         [_] -> True
         [first, second, ..rest] -> {
-          let line1 = dropped |> list.append([first]) |> list.append(rest)
-          case function(line1, increase_decrease(line1), True, []) {
-            True -> True
-            False -> {
-              let line2 = dropped |> list.append([second]) |> list.append(rest)
-              case function(line2, increase_decrease(line2), True, []) {
-                True -> True
-                False -> {
-                  case dropped {
-                    [_] -> function(line, increase_decrease(line), True, [])
-                    _ -> False
-                  }
-                }
-              }
-            }
+          let line1 = [dropped, [first], rest] |> list.flatten()
+          let line2 = [dropped, [second], rest] |> list.flatten()
+
+          let reports = case dropped {
+            [_] -> [line1, line2]
+            _ -> [line1, line2, line]
           }
+
+          list.any(reports, fn(report) {
+            function(report, increase_decrease(report), True, [])
+          })
         }
       }
     }
