@@ -18,6 +18,18 @@ pub fn parse_sample(day: Int) {
   |> string.split(on: "\n")
 }
 
+pub fn parse_line_no_split(day: Int) {
+  get_file(day, False)
+  |> simplifile.read
+  |> result.unwrap("")
+}
+
+pub fn parse_sample_no_split(day: Int) {
+  get_file(day, True)
+  |> simplifile.read
+  |> result.unwrap("")
+}
+
 fn get_file(day: Int, sample: Bool) {
   let filename = case sample {
     True -> "/sample.txt"
