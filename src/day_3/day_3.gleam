@@ -19,10 +19,7 @@ fn pt_1(memory: String) {
   memory
   |> string.split(on: "mul(")
   |> list.map(fn(x) {
-    x
-    |> string.split(on: ")")
-    |> list.first()
-    |> result.unwrap("")
+    x |> string.split(on: ")") |> list.first() |> result.unwrap("")
   })
   |> list.map(fn(x) {
     x
