@@ -8,6 +8,7 @@ pub fn main() {
   let day = 4
   let res = runner.parse_line(day)
   let sample = runner.parse_sample(day)
+  let assert 18 = pt_1(sample)
   let assert 9 = pt_2(sample)
   pt_2(res)
   |> io.debug

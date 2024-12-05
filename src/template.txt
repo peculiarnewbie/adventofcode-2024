@@ -1,0 +1,16 @@
+import gleam/io
+import runner/runner
+
+pub fn main() {
+  let day = 0
+  let res = runner.parse_line(day)
+  let sample =
+    runner.parse_sample(day)
+    let assert 0 = pt_1(sample)
+
+    pt_1(res)
+    |> io.debug
+}
+fn pt_1(lines: List(String)) {
+  todo
+}
