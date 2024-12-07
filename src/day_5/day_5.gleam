@@ -18,10 +18,10 @@ pub fn main() {
     |> list.map(fn(x) { string.trim(x) })
 
   let assert 143 = pt_1(sample)
-  let assert 4569 = pt_1(res)
+  pt_1(res) |> io.debug
 
   let assert 123 = pt_2(sample)
-  let assert 6456 = pt_2(res) |> io.debug
+  pt_2(res) |> io.debug
 }
 
 fn pt_1(lines: List(String)) {

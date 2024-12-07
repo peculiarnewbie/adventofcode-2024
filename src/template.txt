@@ -1,16 +1,24 @@
 import gleam/io
+import gleam/list
+import gleam/string
 import runner/runner
 
 pub fn main() {
   let day = 0
-  let res = runner.parse_line(day)
+  let res =
+    runner.parse_line(day)
+    |> list.map(fn(x) { string.trim(x) })
   let sample =
     runner.parse_sample(day)
-    let assert 0 = pt_1(sample)
+    |> list.map(fn(x) { string.trim(x) })
 
-    pt_1(res)
-    |> io.debug
+  let assert 143 = pt_1(sample)
 }
+
 fn pt_1(lines: List(String)) {
+  todo
+}
+
+fn pt_2(lines: List(String)) {
   todo
 }
