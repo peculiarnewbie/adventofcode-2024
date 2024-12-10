@@ -17,36 +17,26 @@ pub fn main() {
 
   let assert 36 = pt_1(sample)
   pt_1(res) |> io.debug
+
+  let assert 81 = pt_2(sample)
+  pt_2(res) |> io.debug
 }
 
 fn pt_1(lines: List(String)) {
-  let dimension = #(
-    lines |> list.first() |> result.unwrap("") |> string.length,
-    lines |> list.length,
-  )
-
-  let map =
-    lines
-    |> list.index_map(fn(line, y) {
-      line
-      |> string.to_graphemes
-      |> list.index_map(fn(grapheme, x) {
-        grapheme
-        |> int.parse
-        |> result.unwrap(0)
-        |> fn(z) { #(#(x, y), z) }
-      })
-    })
-    |> list.flatten
-    |> dict.from_list
-  // |> io.debug
+  let map = build_map(lines)
 
   map
   |> dict.fold(0, fn(acc, key, val) {
     case val {
       0 -> {
         let head_list =
-          get_trailhead_score(map, key, current_step: 0, heads: dict.new())
+          get_trailhead_score(
+            map,
+            key,
+            current_step: 0,
+            heads: dict.new(),
+            pt: 1,
+          )
         // io.debug(#(key, head_list))
         acc + list.length(head_list)
       }
@@ -55,11 +45,28 @@ fn pt_1(lines: List(String)) {
   })
 }
 
+fn build_map(lines: List(String)) {
+  lines
+  |> list.index_map(fn(line, y) {
+    line
+    |> string.to_graphemes
+    |> list.index_map(fn(grapheme, x) {
+      grapheme
+      |> int.parse
+      |> result.unwrap(0)
+      |> fn(z) { #(#(x, y), z) }
+    })
+  })
+  |> list.flatten
+  |> dict.from_list
+}
+
 fn get_trailhead_score(
   map: dict.Dict(#(Int, Int), Int),
   pos: #(Int, Int),
   current_step current_step: Int,
   heads heads: dict.Dict(#(Int, Int), Bool),
+  pt pt: Int,
 ) {
   case current_step {
     -1 -> []
@@ -76,31 +83,56 @@ fn get_trailhead_score(
       let left_step = dict.get(map, left) |> result.unwrap(-1)
 
       let up_list = case up_step == { a + 1 } {
-        True -> get_trailhead_score(map, up, up_step, heads)
+        True -> get_trailhead_score(map, up, up_step, heads, pt)
         False -> []
       }
       let right_list = case right_step == { a + 1 } {
-        True -> get_trailhead_score(map, right, right_step, heads)
+        True -> get_trailhead_score(map, right, right_step, heads, pt)
         False -> []
       }
       let down_list = case down_step == { a + 1 } {
-        True -> get_trailhead_score(map, down, down_step, heads)
+        True -> get_trailhead_score(map, down, down_step, heads, pt)
         False -> []
       }
       let left_list = case left_step == { a + 1 } {
-        True -> get_trailhead_score(map, left, left_step, heads)
+        True -> get_trailhead_score(map, left, left_step, heads, pt)
         False -> []
       }
 
-      up_list
-      |> list.append(right_list)
-      |> list.append(down_list)
-      |> list.append(left_list)
-      |> list.unique
+      let res =
+        up_list
+        |> list.append(right_list)
+        |> list.append(down_list)
+        |> list.append(left_list)
+
+      case pt {
+        1 -> res |> list.unique
+        _ -> res
+      }
+      //   |> list.unique
     }
   }
 }
 
 fn pt_2(lines: List(String)) {
-  todo
+  let map = build_map(lines)
+
+  map
+  |> dict.fold(0, fn(acc, key, val) {
+    case val {
+      0 -> {
+        let head_list =
+          get_trailhead_score(
+            map,
+            key,
+            current_step: 0,
+            heads: dict.new(),
+            pt: 2,
+          )
+        // io.debug(#(key, head_list))
+        acc + list.length(head_list)
+      }
+      _ -> acc
+    }
+  })
 }

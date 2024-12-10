@@ -15,7 +15,7 @@ pub fn main() {
     |> list.map(fn(x) { string.trim(x) })
 
   let assert 3749 = pt_1(sample)
-  pt_1(res)
+  // pt_1(res)
 
   let assert 11_387 = pt_2(sample)
   pt_2(res)
@@ -41,7 +41,7 @@ fn pt_1(lines: List(String)) {
 fn pt_2(lines: List(String)) {
   lines
   |> generate_res_tuple()
-  |> io.debug
+  // |> io.debug
   |> list.map(fn(x) {
     let #(result, children) = x
     let pass = traverse_with_combine(result, children)
@@ -79,7 +79,7 @@ fn traverse(result: Int, children: List(Int), acc: Int) {
     [] ->
       case acc == result {
         True -> {
-          io.debug(#(result, children, acc))
+          // io.debug(#(result, children, acc))
           True
         }
         False -> False
