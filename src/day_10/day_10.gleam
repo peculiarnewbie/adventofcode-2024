@@ -15,14 +15,14 @@ pub fn main() {
     runner.parse_sample(day)
     |> list.map(fn(x) { string.trim(x) })
 
-  let assert 36 = pt_1(sample)
-  pt_1(res) |> io.debug
+  let assert 36 = pt(sample, 1)
+  pt(res, 1) |> io.debug
 
-  let assert 81 = pt_2(sample)
-  pt_2(res) |> io.debug
+  let assert 81 = pt(sample, 2)
+  pt(res, 2) |> io.debug
 }
 
-fn pt_1(lines: List(String)) {
+fn pt(lines: List(String), pt: Int) {
   let map = build_map(lines)
 
   map
@@ -35,7 +35,7 @@ fn pt_1(lines: List(String)) {
             key,
             current_step: 0,
             heads: dict.new(),
-            pt: 1,
+            pt: pt,
           )
         // io.debug(#(key, head_list))
         acc + list.length(head_list)
@@ -112,27 +112,4 @@ fn get_trailhead_score(
       //   |> list.unique
     }
   }
-}
-
-fn pt_2(lines: List(String)) {
-  let map = build_map(lines)
-
-  map
-  |> dict.fold(0, fn(acc, key, val) {
-    case val {
-      0 -> {
-        let head_list =
-          get_trailhead_score(
-            map,
-            key,
-            current_step: 0,
-            heads: dict.new(),
-            pt: 2,
-          )
-        // io.debug(#(key, head_list))
-        acc + list.length(head_list)
-      }
-      _ -> acc
-    }
-  })
 }
