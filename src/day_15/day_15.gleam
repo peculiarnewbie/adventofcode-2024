@@ -95,7 +95,7 @@ fn can_move_box(
 }
 
 fn print_map(map: dict.Dict(#(Int, Int), String), size: #(Int, Int)) {
-  // io.print("\u{001b}[H")
+  io.print("\u{001b}[H")
   let horizontal = list.range(0, size.1)
   let vertical = list.range(0, size.0)
 
