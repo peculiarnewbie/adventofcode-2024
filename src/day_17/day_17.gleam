@@ -1,7 +1,6 @@
 import gleam/float
 import gleam/int
 import gleam/io
-import gleam/iterator
 import gleam/list
 import gleam/result
 import gleam/string
@@ -17,7 +16,7 @@ pub fn main() {
     |> list.map(fn(x) { string.trim(x) })
 
   //   let assert 143 = 
-  //   pt_1(sample)
+  pt_1(sample)
   //   pt_1(res)
   pt_1(res)
 }
@@ -33,7 +32,7 @@ fn pt_1(lines: List(String)) {
     |> io.debug
 
   //   let #(final_registers, output) =
-  //   run_operation(operations, registers, [], operations) |> io.debug
+  run_operation(operations, registers, [], operations) |> io.debug
   generate_pt_2_ops(operations)
 }
 
@@ -41,11 +40,7 @@ fn generate_pt_2_ops(ops: List(Int)) {
   let new_ops = [0, 1, 2, 3, 4, 1, 5]
   //   let #(relevant, _) = ops |> list.split(length - 2) |> io.debug
   //   reverse_operations(ops |> list.reverse, new_ops, Registers(0, 3, 0))
-  reverse_operations(
-    [2, 1, 0, 1, 7, 2, 5, 0, 3] |> list.reverse,
-    new_ops,
-    Registers(0, 3, 0),
-  )
+  reverse_operations(ops |> list.reverse, new_ops, Registers(0, 3, 0))
   |> io.debug
 }
 
@@ -98,8 +93,8 @@ fn new_ops(op: Int, input: Int, registers: Registers) {
     }
     4 -> {
       // 7, 5
-      let multiplier = 2 |> int.power(b |> int.to_float) |> result.unwrap(0.0)
-      let res = c |> int.to_float |> float.multiply(multiplier) |> float.round
+      //   let multiplier = 2 |> int.power(b |> int.to_float) |> result.unwrap(0.0)
+      //   let res = c |> int.to_float |> float.multiply(multiplier) |> float.round
       Registers(a, b, c)
     }
     5 -> {
@@ -112,7 +107,7 @@ fn new_ops(op: Int, input: Int, registers: Registers) {
       io.debug(#(rem, addition))
       Registers(a, b - rem, c)
     }
-    _ -> todo
+    _ -> Registers(a, b, c)
   }
 }
 
