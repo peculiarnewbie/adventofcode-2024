@@ -18,17 +18,21 @@ pub fn main() {
 
   //   let assert 143 =
   pt_1(sample)
-  pt_1(res)
+  //   pt_1(res)
 }
 
 fn pt_1(lines: List(String)) {
   let #(map, size) = generate_map(lines)
   let init_pos = Coord(1, size.1 - 1)
 
+  //   map
+  //   |> generate_graph_priority(dict.new(), _, [PathDir(init_pos, 0, 1)])
+  //   |> io.debug
+  //   |> print_res(size)
+
   map
-  |> generate_graph_priority(dict.new(), _, [PathDir(init_pos, 0, 1)])
+  |> traverse_map([NewPath(init_pos, 0, 1, 1)], _, Coord(size.0 - 1, 1))
   |> io.debug
-  |> print_res(size)
 }
 
 fn generate_map(lines: List(String)) {
@@ -45,7 +49,78 @@ fn generate_map(lines: List(String)) {
   let y_size = lines |> list.length
   let x_size = lines |> list.first |> result.unwrap("") |> string.length
 
-  #(map, #(x_size - 1, y_size - 1))
+  #(map, #(x_size, y_size))
+}
+
+pub type NewPath {
+  NewPath(coord: Coord, score: Int, prev_dir: Int, dir: Int)
+}
+
+fn traverse_map(
+  prio_queue: List(NewPath),
+  map: dict.Dict(Coord, String),
+  end: Coord,
+) {
+  use current_node <- check_queue(prio_queue)
+  let NewPath(current_coord, score, _, dir) = current_node
+
+  use _ <- check_end(current_coord, end, score)
+  let new_map = map |> dict.delete(current_coord)
+
+  find_neighbours(new_map, current_coord, 1)
+  |> list.map(fn(neighbour) {
+    let Path(next_coord, next_dir) = neighbour
+    let cost = case dir == next_dir {
+      True -> 1
+      False -> 1001
+    }
+    NewPath(next_coord, score + cost, dir, next_dir)
+  })
+  |> list.append(prio_queue, _)
+  |> list.drop(1)
+  |> list.sort(fn(a, b) {
+    let NewPath(_, a_score, _, _) = a
+    let NewPath(_, b_score, _, _) = b
+    int.compare(a_score, b_score)
+  })
+  |> traverse_map(new_map, end)
+}
+
+fn check_queue(
+  prio_queue: List(NewPath),
+  function: fn(NewPath) -> Result(Int, Nil),
+) {
+  case prio_queue {
+    [current_node, ..] -> function(current_node)
+    _ -> Error(Nil)
+  }
+}
+
+fn check_end(
+  coord: Coord,
+  end: Coord,
+  score: Int,
+  function: fn(Coord) -> Result(Int, Nil),
+) {
+  case coord == end {
+    True -> Ok(score)
+    False -> function(coord)
+  }
+}
+
+fn find_neighbours(map: dict.Dict(Coord, String), pos: Coord, range: Int) {
+  list.range(0, 3)
+  |> list.map(fn(dir) {
+    let next = get_direction(dir)
+    let Coord(x, y) = pos
+    let next_pos = Coord(x + next.0 * range, y + next.1 * range)
+    case map |> dict.get(next_pos) {
+      Ok(".") | Ok("E") -> Ok(Path(next_pos, dir))
+      _ -> Error(Nil)
+    }
+  })
+  |> list.filter(fn(x) { x != Error(Nil) })
+  |> list.map(fn(x) { x |> result.unwrap(Path(Coord(-1, -1), -1)) })
 }
 
 pub type Node {

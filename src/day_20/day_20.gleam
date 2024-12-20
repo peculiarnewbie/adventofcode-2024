@@ -22,7 +22,7 @@ pub fn main() {
     |> list.map(fn(x) { string.trim(x) })
 
   //   let assert 143 = 
-  //   pt_1(sample)
+  pt_1(sample)
   //   pt_1(res)
   //   pt_2(sample, 49)
   pt_2(res, 99)
@@ -175,7 +175,9 @@ fn find_hyper_cheats(
     // |> io.debug
     |> dict.from_list
 
-  traverse_hyper_cheats(path, map, path_map, dict.new(), lower_limit)
+  let spread = create_spread(20)
+
+  traverse_hyper_cheats(path, map, path_map, dict.new(), lower_limit, spread)
 }
 
 fn traverse_hyper_cheats(
@@ -184,17 +186,18 @@ fn traverse_hyper_cheats(
   path_map: dict.Dict(Coord, Int),
   res: dict.Dict(Int, Int),
   lower_limit: Int,
+  spread: List(#(Coord, Int)),
 ) {
   //   io.debug(path |> list.first |> result.unwrap(Coord(0, 0)))
   case path |> list.first {
     Ok(current_coord) -> {
       let index = path_map |> dict.get(current_coord) |> result.unwrap(0)
       let new_map = map |> dict.delete(current_coord)
-      find_hyper_skips(new_map, current_coord, 20)
+      find_hyper_skips(new_map, current_coord, spread)
       //   |> io.debug
       |> list.fold(res, fn(acc, jump) {
-        let skip_index = path_map |> dict.get(jump.coord) |> result.unwrap(0)
-        let efficiency = skip_index - index - jump.time
+        let skip_index = path_map |> dict.get(jump.0) |> result.unwrap(0)
+        let efficiency = skip_index - index - jump.1
         case efficiency > lower_limit {
           True ->
             case acc |> dict.get(efficiency) {
@@ -210,19 +213,28 @@ fn traverse_hyper_cheats(
         path_map,
         _,
         lower_limit,
+        spread,
       )
     }
     _ -> res
   }
 }
 
-fn find_hyper_skips(map: dict.Dict(Coord, String), pos: Coord, spread: Int) {
-  find_spread(pos, spread)
+fn find_hyper_skips(
+  map: dict.Dict(Coord, String),
+  pos: Coord,
+  spread: List(#(Coord, Int)),
+) {
+  //   find_spread(pos, spread)
   //   |> io.debug
-  |> list.filter(fn(jump) {
-    case map |> dict.get(jump.coord) {
-      Ok(".") | Ok("E") -> True
-      _ -> False
+  let Coord(x_pos, y_pos) = pos
+  spread
+  |> list.filter_map(fn(jump) {
+    let Coord(x, y) = jump.0
+    let new_pos = Coord(x_pos + x, y_pos + y)
+    case map |> dict.get(new_pos) {
+      Ok(".") | Ok("E") -> Ok(#(new_pos, jump.1))
+      _ -> Error(Nil)
     }
   })
 }
@@ -231,8 +243,16 @@ pub type Skip {
   Skip(coord: Coord, time: Int)
 }
 
-fn find_spread(pos: Coord, spread: Int) {
+fn find_spread(pos: Coord, spread: List(#(Coord, Int))) {
   let Coord(x_pos, y_pos) = pos
+  spread
+  |> list.fold([], fn(acc, jump) {
+    let #(Coord(x, y), time) = jump
+    acc |> list.append([Skip(Coord(x_pos + x, y_pos + y), time)])
+  })
+}
+
+fn create_spread(spread: Int) {
   list.range(0, spread)
   |> list.fold(dict.new(), fn(acc, prev_x) {
     list.range(0, prev_x)
@@ -252,10 +272,6 @@ fn find_spread(pos: Coord, spread: Int) {
     })
   })
   |> dict.to_list
-  |> list.fold([], fn(acc, jump) {
-    let #(Coord(x, y), time) = jump
-    acc |> list.append([Skip(Coord(x_pos + x, y_pos + y), time)])
-  })
 }
 
 fn check_queue(
